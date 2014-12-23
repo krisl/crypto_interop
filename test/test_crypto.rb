@@ -19,4 +19,11 @@ class CryptoTest < Minitest::Test
     aes = CryptoInterop::Rijndael.new_with_pbkdf(pbkdf)
     assert_equal "\xC6\xBFe\x8A1\x8B\xCD>\x80\xE6\x9A1c\x0F\x99j\xA8,\xDCy\xFE\x8B\xF9k\xE2\xEBNlOh\xE1\x8A".b, aes.encrypt('really secret stuff')
   end
+
+  def test_password_derived_bytes
+    pass = 'password'
+    salt = 'saltsalt'
+    pdbg = CryptoInterop::PasswordDeriveBytes.new(pass, salt, 'SHA256', 28)
+    assert_equal "?_7\xF1\xFEe:\xC9\xC0\x92Gi\x1A\x83f%\x0F\x00\x92\x90O\xC1H\xAE\xB9$\x0F\xE3C\x1E\x82p".b, pdbg.get_bytes(32)
+  end
 end

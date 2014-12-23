@@ -17,6 +17,24 @@ module CryptoInterop
     end
   end
 
+  class PasswordDeriveBytes
+    def initialize(pass, salt, algo, iter)
+      @pass = pass
+      @salt = salt
+      @iter = iter
+      @hash = OpenSSL::Digest.new(algo)
+    end
+
+    def get_bytes(qty)
+      raise 'only size %s supported' % @hash.length if qty != @hash.length
+      dgst = @hash.update(@pass + @salt).digest
+
+      (@iter-1).times.reduce(dgst) do |dgst|
+        @hash.reset.update(dgst).digest
+      end
+    end
+  end
+
   class Rijndael
     def initialize(key, iv = nil)
       @key = key
