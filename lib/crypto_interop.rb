@@ -17,4 +17,37 @@ module CryptoInterop
     end
   end
 
+  class Rijndael
+    def initialize(key, iv = nil)
+      @key = key
+      @iv  = iv
+    end
+
+    def self.new_with_pbkdf(pbkdf)
+      key = pbkdf.get_bytes(256/8)
+      iv  = pbkdf.get_bytes(128/8)
+      new(key, iv)
+    end
+
+    def decrypt(cipher_text)
+      crypt(cipher_text, get_aes.decrypt)
+    end
+
+    def encrypt(plain_text)
+      crypt(plain_text, get_aes.encrypt)
+    end
+
+    private
+
+    def get_aes
+      @aes ||= OpenSSL::Cipher.new('AES-256-CBC')
+    end
+
+    def crypt(text, aes)
+      aes.key = @key
+      aes.iv  = @iv
+      aes.update(text) + aes.final
+    end
+  end
+
 end
