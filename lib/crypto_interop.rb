@@ -1,4 +1,5 @@
 require 'openssl'
+require 'securerandom'
 
 module CryptoInterop
 
@@ -65,6 +66,21 @@ module CryptoInterop
       aes.key = @key
       aes.iv  = @iv
       aes.update(text) + aes.final
+    end
+  end
+
+  #microsoft.practices.enterpriselibrary.security.cryptography.cryptographer
+  module MSELCryptographer
+    def self.create_hash(algo, plain_text)
+      salt = SecureRandom.random_bytes(16)
+      hash = OpenSSL::Digest.digest(algo, salt + plain_text)
+      salt + hash
+    end
+
+    def self.compare_hash(algo, plain_text, hashed_text)
+      salt = hashed_text[0..15]
+      hash = OpenSSL::Digest.digest(algo, salt + plain_text)
+      salt + hash == hashed_text
     end
   end
 

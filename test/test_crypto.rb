@@ -26,4 +26,9 @@ class CryptoTest < Minitest::Test
     pdbg = CryptoInterop::PasswordDeriveBytes.new(pass, salt, 'SHA256', 28)
     assert_equal "?_7\xF1\xFEe:\xC9\xC0\x92Gi\x1A\x83f%\x0F\x00\x92\x90O\xC1H\xAE\xB9$\x0F\xE3C\x1E\x82p".b, pdbg.get_bytes(32)
   end
+
+  def test_create_hash_and_compare_hash
+    hash = CryptoInterop::MSELCryptographer.create_hash('SHA1', 'boogabooga')
+    assert CryptoInterop::MSELCryptographer.compare_hash('SHA1', 'boogabooga', hash)
+  end
 end
